@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Curiosity Pulse — what the world is reading right now</title>
+<meta name="description" content="A live mood-of-the-world dashboard: top Wikipedia reads by country plus a real-time feed of human edits worldwide.">
+<meta name="theme-color" content="#05070d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Curiosity Pulse">
+<meta property="og:title" content="Curiosity Pulse — the nervous system of the internet">
+<meta property="og:description" content="See what countries are obsessing over on Wikipedia, plus live human edits as they happen.">
+<meta property="og:url" content="https://curiosity-pulse.suvadipchakraborty.workers.dev/">
+<meta property="og:image" content="https://curiosity-pulse.suvadipchakraborty.workers.dev/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Curiosity Pulse — the nervous system of the internet">
+<meta name="twitter:description" content="See what countries are obsessing over on Wikipedia, plus live human edits as they happen.">
+<meta name="twitter:image" content="https://curiosity-pulse.suvadipchakraborty.workers.dev/preview.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span id="globe" class="globe" aria-hidden="true">🌍</span>
+    <div>
+      <h1>Curiosity Pulse</h1>
+      <p id="tagline" class="tagline" aria-label="Tapping into the nervous system of the internet"></p>
+    </div>
+  </div>
+  <div class="actions">
+    <span id="status" class="status" role="status"><i></i><b>connecting</b></span>
+    <button id="shareBtn" class="btn" aria-label="Share Curiosity Pulse">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      Share
+    </button>
+    <button id="installBtn" class="btn primary">Save App</button>
+  </div>
+</header>
+
+<main class="layout">
+  <section aria-labelledby="readH">
+    <div class="sec-head">
+      <h2 id="readH">Reading pulse</h2>
+      <span id="readDate" class="muted mono"></span>
+    </div>
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </section>
+
+  <aside class="live" aria-labelledby="liveH">
+    <div class="sec-head">
+      <h2 id="liveH">Live edits</h2>
+      <span class="mono muted"><b id="count" class="neon">0</b> seen</span>
+    </div>
+    <div class="spark-wrap">
+      <canvas id="spark" width="360" height="64" aria-label="Edits per second, last 40 seconds"></canvas>
+      <span id="rate" class="mono rate">0.0/s</span>
+    </div>
+    <ol id="feed" class="feed mono" aria-live="off"></ol>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>Built by Suva</span>
+  <a href="mailto:suvadipchakraborty@gmail.com?subject=Curiosity%20Pulse%20feedback">Send feedback</a>
+  <span class="muted">Data: Wikimedia public APIs</span>
+</footer>
+<script src="app.js" type="module"></script>
+</body>
+</html>
