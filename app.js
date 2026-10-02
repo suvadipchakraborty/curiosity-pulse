@@ -2,8 +2,7 @@ const COUNTRIES = [
   ['US', 'United States'], ['IN', 'India'], ['GB', 'United Kingdom'], ['JP', 'Japan'],
   ['ZA', 'South Africa'], ['BR', 'Brazil'], ['DE', 'Germany'], ['AU', 'Australia'],
 ];
-const API_HEADERS = { 'Api-User-Agent': 'CuriosityPulse/1.0 (suvadipchakraborty@gmail.com)' };
-// Browsers forbid overriding User-Agent; Wikimedia reads Api-User-Agent for browser clients.
+// No custom headers: browsers can't set User-Agent, and extra headers trigger a CORS preflight that can block the request.
 const SKIP = /^(Main_Page|-|Special:.*|Wikipedia:.*|Help:.*|Portal:.*|File:.*|Category:.*|Talk:.*|User:.*|Template:.*)$/i;
 const $ = (id) => document.getElementById(id);
 const flag = (c) => String.fromCodePoint(...[...c].map((x) => 127397 + x.charCodeAt(0)));
@@ -24,12 +23,12 @@ const ymd = (daysAgo) => {
 };
 
 async function fetchTop(code) {
-  for (const back of [1, 2]) { // yesterday, then fall back a day if not aggregated yet
+  for (const back of [1, 2, 3]) { // yesterday, then fall back if not aggregated yet
     const [y, m, d] = ymd(back);
     const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/top-per-country/${code}/all-access/${y}/${m}/${d}`;
-    const res = await fetch(url, { headers: API_HEADERS });
+    const res = await fetch(url);
     if (res.status === 404) continue;
-    if (!res.ok) throw new Error(res.status);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const articles = (data.items?.[0]?.articles || [])
       .filter((a) => !SKIP.test(a.article))
@@ -78,7 +77,7 @@ async function loadReading() {
     else {
       const e = document.createElement('div');
       e.className = 'card err';
-      e.textContent = `${COUNTRIES[i][1]}: couldn't load data. Reload to retry.`;
+      e.textContent = `${COUNTRIES[i][1]}: couldn't load data (${r.reason?.message || 'unknown'}). Reload to retry.`;
       grid.append(e);
     }
   });
