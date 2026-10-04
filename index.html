@@ -69,6 +69,18 @@
   <a href="mailto:suvadipchakraborty@gmail.com?subject=Curiosity%20Pulse%20feedback">Send feedback</a>
   <span class="muted">Data: Wikimedia public APIs</span>
 </footer>
+<div id="reader" class="reader" role="dialog" aria-modal="true" aria-labelledby="readerTitle" hidden>
+  <header class="reader-bar">
+    <button id="readerClose" class="btn" type="button" aria-label="Close article">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <h2 id="readerTitle" class="reader-title"></h2>
+    <a id="readerOpen" class="btn" target="_blank" rel="noopener" aria-label="Open on Wikipedia in a new tab">Wikipedia ↗</a>
+  </header>
+  <div id="readerLoad" class="reader-load" aria-hidden="true"></div>
+  <div id="readerBody" class="reader-body"></div>
+</div>
 <script src="app.js" type="module"></script>
 </body>
 </html>

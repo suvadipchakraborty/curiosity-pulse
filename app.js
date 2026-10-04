@@ -52,6 +52,11 @@ function card([code, name], { articles }) {
     link.href = `https://${a.project}.org/wiki/${encodeURIComponent(a.article)}`;
     link.target = '_blank'; link.rel = 'noopener';
     link.textContent = decodeURIComponent(a.article.replace(/%(?![0-9A-F]{2})/gi, '%25')).replace(/_/g, ' ');
+    // Plain click/tap reads the article in-app; modified clicks (ctrl/cmd/middle) still open a new tab.
+    link.addEventListener('click', (ev) => {
+      if (ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      if (openReader(a, link.textContent, link)) ev.preventDefault();
+    });
     const meta = document.createElement('span');
     meta.className = 'views';
     meta.textContent = `${a.project.replace('.wikipedia', '')} · ≤${fmt.format(a.views_ceil)} views`;
@@ -83,6 +88,54 @@ async function loadReading() {
   });
   $('readDate').textContent = date ? `top reads · ${date} UTC` : '';
 }
+
+/* ---------- In-app article reader ---------- */
+// Opens the Wikipedia article in a full-screen panel inside the app (an iframe of the article itself).
+// A fresh iframe is created per open and removed on close, so links followed inside the article
+// don't leave stray entries in the browser history.
+const reader = $('reader'), readerBody = $('readerBody'), readerLoad = $('readerLoad');
+let readerOpener = null, readerPushed = false;
+
+function openReader(article, title, opener) {
+  const m = /^([a-z][a-z-]*)\.wikipedia$/.exec(article.project || '');
+  if (!m) return false; // unknown project: fall back to the normal new-tab link
+  const narrow = window.matchMedia('(max-width: 900px)').matches;
+  const host = `${m[1]}${narrow ? '.m' : ''}.wikipedia.org`;
+  const path = `/wiki/${encodeURIComponent(article.article)}`;
+
+  readerBody.replaceChildren();
+  const f = document.createElement('iframe');
+  f.className = 'reader-frame';
+  f.title = `Wikipedia: ${title}`;
+  f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox'); // no top-navigation: the article can't take over the app
+  f.addEventListener('load', () => readerLoad.classList.remove('on'));
+  readerLoad.classList.add('on');
+  f.src = `https://${host}${path}`;
+  readerBody.append(f);
+
+  $('readerTitle').textContent = title;
+  $('readerOpen').href = `https://${article.project}.org${path}`;
+  readerOpener = opener;
+  reader.hidden = false;
+  document.documentElement.classList.add('reading');
+  history.pushState({ reader: 1 }, ''); readerPushed = true; // so the phone's Back gesture closes the reader
+  $('readerClose').focus();
+  return true;
+}
+
+function closeReader(fromPopState) {
+  if (reader.hidden) return;
+  reader.hidden = true;
+  readerBody.replaceChildren(); // removing the iframe also drops its history entries
+  readerLoad.classList.remove('on');
+  document.documentElement.classList.remove('reading');
+  const pushed = readerPushed; readerPushed = false;
+  if (pushed && !fromPopState) history.back();
+  readerOpener?.focus({ preventScroll: true }); readerOpener = null;
+}
+$('readerClose').addEventListener('click', () => closeReader());
+window.addEventListener('popstate', () => closeReader(true));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeReader(); });
 
 /* ---------- Live Edit Stream ---------- */
 const feed = $('feed'), globe = $('globe'), status = $('status');
